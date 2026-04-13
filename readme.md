@@ -15,14 +15,36 @@ The system leverages supervised learning techniques and provides **visual insigh
 * Analyze network traffic patterns
 * Visualize results using graphs and heatmaps
 * Simulate real-time cybersecurity monitoring
-
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Tools Used
 
-* **Programming Language:** Python
-* **Libraries:** Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn
-* **Tools:** VS Code, Git, GitHub
+### 🔹 Programming Language
+- Python
+
+### 🔹 Libraries & Frameworks
+- Pandas → Data manipulation and preprocessing  
+- NumPy → Numerical computations  
+- Scikit-learn → Machine Learning (Random Forest Classifier)  
+- Matplotlib → Basic data visualization  
+- Seaborn → Advanced visualization (Heatmaps, Confusion Matrix)
+
+### 🔹 Machine Learning Model
+- Random Forest Classifier (Supervised Learning)
+
+### 🔹 Dataset
+- NSL-KDD / KDD Cup Dataset (Cybersecurity dataset from Kaggle)
+
+### 🔹 Development Tools
+- VS Code → Code editor  
+- Git → Version control  
+- GitHub → Project hosting and collaboration  
+
+### 🔹 Visualization Outputs
+- Confusion Matrix  
+- Feature Importance Graph  
+- Correlation Heatmap  
+
 
 ---
 
