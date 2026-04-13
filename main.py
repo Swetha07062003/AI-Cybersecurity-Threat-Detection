@@ -1,45 +1,66 @@
+# =========================================
+# AI CYBERSECURITY THREAT DETECTION SYSTEM
+# FINAL COMPLETE VERSION (ALL 3 GRAPHS)
+# =========================================
+
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-import joblib
+import numpy as np
+import os
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-# -----------------------------
-# STEP 1: LOAD DATA
-# -----------------------------
+import matplotlib.pyplot as plt
+import seaborn as sns
+import joblib
+
+# =========================================
+# CREATE REQUIRED FOLDERS
+# =========================================
+os.makedirs("models", exist_ok=True)
+os.makedirs("outputs", exist_ok=True)
+os.makedirs("images", exist_ok=True)
+
+# =========================================
+# LOAD DATASET
+# =========================================
+print("Loading dataset...")
 data = pd.read_csv("data/cyber_data.csv", header=None)
 
+# =========================================
+# COLUMN NAMES
+# =========================================
 columns = [
-    "duration","protocol_type","service","flag","src_bytes","dst_bytes","land","wrong_fragment",
-    "urgent","hot","num_failed_logins","logged_in","num_compromised","root_shell","su_attempted",
-    "num_root","num_file_creations","num_shells","num_access_files","num_outbound_cmds",
-    "is_host_login","is_guest_login","count","srv_count","serror_rate","srv_serror_rate",
-    "rerror_rate","srv_rerror_rate","same_srv_rate","diff_srv_rate","srv_diff_host_rate",
-    "dst_host_count","dst_host_srv_count","dst_host_same_srv_rate","dst_host_diff_srv_rate",
-    "dst_host_same_src_port_rate","dst_host_srv_diff_host_rate","dst_host_serror_rate",
-    "dst_host_srv_serror_rate","dst_host_rerror_rate","dst_host_srv_rerror_rate",
-    "label","difficulty"
+"duration","protocol_type","service","flag","src_bytes","dst_bytes","land","wrong_fragment",
+"urgent","hot","num_failed_logins","logged_in","num_compromised","root_shell","su_attempted",
+"num_root","num_file_creations","num_shells","num_access_files","num_outbound_cmds",
+"is_host_login","is_guest_login","count","srv_count","serror_rate","srv_serror_rate",
+"rerror_rate","srv_rerror_rate","same_srv_rate","diff_srv_rate","srv_diff_host_rate",
+"dst_host_count","dst_host_srv_count","dst_host_same_srv_rate","dst_host_diff_srv_rate",
+"dst_host_same_src_port_rate","dst_host_srv_diff_host_rate","dst_host_serror_rate",
+"dst_host_srv_serror_rate","dst_host_rerror_rate","dst_host_srv_rerror_rate",
+"label","difficulty"
 ]
 
 data.columns = columns
 
-# -----------------------------
-# STEP 2: CLEAN DATA
-# -----------------------------
+# =========================================
+# DATA CLEANING
+# =========================================
+print("Cleaning data...")
 data = data.drop("difficulty", axis=1)
 
-# Convert label
+# Convert label to binary
 data["label"] = data["label"].apply(lambda x: 0 if x == "normal" else 1)
 
-# Encode categorical
+# One-hot encoding
 data = pd.get_dummies(data, columns=["protocol_type", "service", "flag"])
 
-# -----------------------------
-# STEP 3: SPLIT DATA
-# -----------------------------
+# =========================================
+# SPLIT DATA
+# =========================================
+print("Splitting dataset...")
 X = data.drop("label", axis=1)
 y = data["label"]
 
@@ -47,63 +68,102 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# -----------------------------
-# STEP 4: TRAIN MODEL
-# -----------------------------
-model = RandomForestClassifier(n_estimators=100)
+# =========================================
+# TRAIN MODEL
+# =========================================
+print("Training model...")
+model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# -----------------------------
-# STEP 5: EVALUATION
-# -----------------------------
+# =========================================
+# MODEL EVALUATION
+# =========================================
+print("Evaluating model...")
 y_pred = model.predict(X_test)
 
-print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
 print("\nClassification Report:\n")
 print(classification_report(y_test, y_pred))
 
-# -----------------------------
-# STEP 6: CONFUSION MATRIX
-# -----------------------------
+# =========================================
+# 1️⃣ CONFUSION MATRIX HEATMAP
+# =========================================
+print("Saving Confusion Matrix...")
+
 cm = confusion_matrix(y_test, y_pred)
 
-plt.figure()
-sns.heatmap(cm, annot=True, fmt="d")
+plt.figure(figsize=(6, 5))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", cbar=False)
+
 plt.xlabel("Predicted")
 plt.ylabel("Actual")
 plt.title("Confusion Matrix")
 
-plt.savefig("outputs/confusion_matrix.png")
-plt.savefig("images/confusion_matrix.png")
+plt.tight_layout()
+plt.savefig("outputs/confusion_matrix.png", dpi=300)
+plt.savefig("images/confusion_matrix.png", dpi=300)
 plt.close()
 
-# -----------------------------
-# STEP 7: FEATURE IMPORTANCE
-# -----------------------------
-importances = model.feature_importances_
-feature_names = X.columns
+print("✅ Confusion Matrix saved!")
 
-importance_df = pd.DataFrame({
-    "Feature": feature_names,
-    "Importance": importances
-}).sort_values(by="Importance", ascending=False).head(10)
+# =========================================
+# 2️⃣ FEATURE IMPORTANCE GRAPH
+# =========================================
+print("Saving Feature Importance Graph...")
 
-plt.figure()
-sns.barplot(x="Importance", y="Feature", data=importance_df)
+feature_importance = pd.Series(model.feature_importances_, index=X.columns)
+
+top_features = feature_importance.nlargest(10)
+top_features = top_features.sort_values()
+
+plt.figure(figsize=(10, 7))
+top_features.plot(kind='barh')
+
 plt.title("Top 10 Important Features")
+plt.xlabel("Importance Score")
 
-plt.savefig("outputs/feature_importance.png")
-plt.savefig("images/feature_importance.png")
+# Fix label visibility
+plt.yticks(fontsize=8)
+plt.subplots_adjust(left=0.35)
+
+plt.tight_layout()
+plt.savefig("outputs/feature_importance.png", dpi=300)
+plt.savefig("images/feature_importance.png", dpi=300)
 plt.close()
 
-# -----------------------------
-# STEP 8: SAVE MODEL
-# -----------------------------
+print("✅ Feature Importance graph saved!")
+
+# =========================================
+# 3️⃣ CORRELATION HEATMAP (SECOND HEATMAP)
+# =========================================
+print("Saving Correlation Heatmap...")
+
+# Reduce features for readability
+corr_data = X.iloc[:, :15]
+
+corr_matrix = corr_data.corr()
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(corr_matrix, cmap="coolwarm")
+
+plt.title("Feature Correlation Heatmap")
+
+plt.tight_layout()
+plt.savefig("outputs/correlation_heatmap.png", dpi=300)
+plt.savefig("images/correlation_heatmap.png", dpi=300)
+plt.close()
+
+print("✅ Correlation Heatmap saved!")
+
+# =========================================
+# SAVE MODEL
+# =========================================
+print("Saving model...")
 joblib.dump(model, "models/cyber_model.pkl")
 
-# -----------------------------
-# STEP 9: SIMULATION (VERY IMPORTANT)
-# -----------------------------
+# =========================================
+# THREAT SIMULATION
+# =========================================
 print("\n--- Threat Detection Simulation ---")
 
 sample = X_test.iloc[0:1]
@@ -114,4 +174,9 @@ if prediction[0] == 1:
 else:
     print("✅ Normal Network Traffic")
 
-print("\nProject Completed Successfully 🚀")
+# =========================================
+# FINAL MESSAGE
+# =========================================
+print("\n✅ PROJECT COMPLETED SUCCESSFULLY 🚀")
+print("📊 3 Graphs saved in 'outputs/' and 'images/' folders")
+print("🤖 Model saved in 'models/'")
