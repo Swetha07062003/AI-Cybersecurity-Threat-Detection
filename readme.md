@@ -89,9 +89,7 @@ The trained model achieves **~99.8% accuracy**, indicating highly effective clas
 
 ![Execution Output](images/output.png)
 
-### 🔹 Full Execution Screenshot
 
-![Execution Process](images/execution_terminal.png)
 
 ---
 
