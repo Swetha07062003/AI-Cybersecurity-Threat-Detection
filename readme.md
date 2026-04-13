@@ -8,6 +8,9 @@ It classifies incoming network traffic as **Normal** or **Attack**, enabling ear
 The system leverages supervised learning techniques and provides **visual insights** through multiple analytical graphs.
 
 ---
+## ❗ Problem Statement
+Traditional cybersecurity systems fail to detect evolving threats.  
+This project uses Machine Learning to automatically identify malicious network activity.
 
 ## 🎯 Objectives
 
@@ -43,7 +46,14 @@ The system leverages supervised learning techniques and provides **visual insigh
 ### 🔹 Visualization Outputs
 - Confusion Matrix  
 - Feature Importance Graph  
-- Correlation Heatmap  
+- Correlation Heatmap
+
+## ⚙️ How It Works
+1. Dataset is loaded and preprocessed  
+2. Categorical data is encoded  
+3. Model is trained using Random Forest  
+4. Predictions are made on test data  
+5. Results are visualized using graphs  
 
 
 ---
@@ -96,6 +106,7 @@ python main.py
 ## 📊 Model Performance
 
 The trained model achieves **~99.8% accuracy**, indicating highly effective classification.
+> Note: High accuracy is achieved due to dataset characteristics and may vary with real-world data.
 
 ### 🔹 Classification Metrics
 
